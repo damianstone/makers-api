@@ -54,3 +54,8 @@ INTEREST_CHOICES = Choices(
     ("venture-capital", "Venture Capital"),
     ("white-labeling", "White Labeling"),
 )
+
+TYPE_CHOICES = Choices(
+        ("startup", "Startup"),
+        ("corporation", "Corporation")
+)

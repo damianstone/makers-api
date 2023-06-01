@@ -6,56 +6,50 @@ from .managers import CustomUserManager
 from django.contrib.postgres.fields import ArrayField
 from model_utils import Choices
 
-from api.data.choices import INDUSTRY_CHOICES, INTEREST_CHOICES
+from api.data.choices import INDUSTRY_CHOICES, INTEREST_CHOICES, TYPE_CHOICES
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    
-    TYPE_CHOICES = Choices(
-        ("startup", "Startup"),
-        ("corporation", "Corporation")
-    )
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.CharField(max_length=200, unique=True)
     firstname = models.CharField(max_length=200, null=True)
     lastname = models.CharField(max_length=200, null=True)
     password = models.CharField(max_length=200)
-
-    meeting_link = models.CharField(max_length=20, null=True)
-    position = models.CharField(max_length=20, null=True)
+    
+    meeting_link = models.CharField(max_length=300, null=True)
+    position = models.CharField(max_length=300, null=True)
     photo = models.ImageField(null=True, blank=True)
 
     company_photo = models.ImageField(null=True, blank=True)
-    company_name = models.CharField(max_length=20, null=True)
-    company_description = models.CharField(max_length=50, null=True)
-    company_valuation = models.CharField(max_length=20, null=True)
-    company_employees = models.CharField(max_length=20, null=True)
-    company_investment = models.CharField(max_length=20, null=True)
+    company_name = models.CharField(max_length=300, null=True)
+    company_description = models.CharField(max_length=300, null=True)
+    company_valuation = models.CharField(max_length=300, null=True)
+    company_employees = models.CharField(max_length=300, null=True)
+    company_investment = models.CharField(max_length=300, null=True)
     
     company_type = models.CharField(
         choices=TYPE_CHOICES,
         default=TYPE_CHOICES.startup,
-        max_length=20,
-        null=False,
-        blank=False,
+        max_length=50,
+        null=True,
+        blank=True,
     )
 
     company_industry = models.CharField(
         choices=INDUSTRY_CHOICES,
         default=INDUSTRY_CHOICES.agriculture,
         max_length=50,
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
     )
     
     interests = ArrayField(models.CharField(
         choices=INTEREST_CHOICES,
         default=INTEREST_CHOICES.collaboration,
-        max_length=20,
-        null=False,
-        blank=False,
-    ), blank=True)
+        max_length=50,
+        null=True,
+        blank=True,
+    ), blank=True, default=list)
 
     USERNAME_FIELD = "email"
 
@@ -70,6 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def delete(self):
         self.photo.delete(save=False)
         super().delete()
+        
 
 
 class Invitation(models.Model):

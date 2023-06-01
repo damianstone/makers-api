@@ -6,7 +6,7 @@ router = routers.DefaultRouter()
 
 router.register(
     r"users",
-    user_views.UserViewSet,
+    user_views.UserModelViewSet,
     basename="user",
 )
 

@@ -44,7 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     company_industry = models.CharField(
         choices=INDUSTRY_CHOICES,
         default=INDUSTRY_CHOICES.agriculture,
-        max_length=20,
+        max_length=50,
         null=False,
         blank=False,
     )
@@ -55,12 +55,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=20,
         null=False,
         blank=False,
-    ), black=True)
+    ), blank=True)
 
     USERNAME_FIELD = "email"
 
     # requred for creating user
-    REQUIRED_FIELDS = ["email"]
+    REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 
@@ -74,8 +74,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Invitation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sender = models.ForeignKey(User, default=None, on_delete=models.CASCADE)
-    receiver = models.ForeignKey(User, default=None, on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, related_name="invitations_sent", default=None, on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, related_name="invitations_received", default=None, on_delete=models.CASCADE)
     message = models.CharField(max_length=50, null=True)
     interest = models.CharField(
         choices=INTEREST_CHOICES,

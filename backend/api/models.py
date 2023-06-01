@@ -3,21 +3,64 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from .managers import CustomUserManager
+from django.contrib.postgres.fields import ArrayField
+from model_utils import Choices
+
+from api.data.choices import INDUSTRY_CHOICES, INTEREST_CHOICES
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    
+    TYPE_CHOICES = Choices(
+        ("startup", "Startup"),
+        ("corporation", "Corporation")
+    )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.CharField(max_length=200, unique=True)
     firstname = models.CharField(max_length=200, null=True)
     lastname = models.CharField(max_length=200, null=True)
     password = models.CharField(max_length=200)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+
+    meeting_link = models.CharField(max_length=20, null=True)
+    position = models.CharField(max_length=20, null=True)
+    photo = models.ImageField(null=True, blank=True)
+
+    company_photo = models.ImageField(null=True, blank=True)
+    company_name = models.CharField(max_length=20, null=True)
+    company_description = models.CharField(max_length=50, null=True)
+    company_valuation = models.CharField(max_length=20, null=True)
+    company_employees = models.CharField(max_length=20, null=True)
+    company_investment = models.CharField(max_length=20, null=True)
+    
+    company_type = models.CharField(
+        choices=TYPE_CHOICES,
+        default=TYPE_CHOICES.startup,
+        max_length=20,
+        null=False,
+        blank=False,
+    )
+
+    company_industry = models.CharField(
+        choices=INDUSTRY_CHOICES,
+        default=INDUSTRY_CHOICES.agriculture,
+        max_length=20,
+        null=False,
+        blank=False,
+    )
+    
+    interests = ArrayField(models.CharField(
+        choices=INTEREST_CHOICES,
+        default=INTEREST_CHOICES.collaboration,
+        max_length=20,
+        null=False,
+        blank=False,
+    ), black=True)
 
     USERNAME_FIELD = "email"
+
     # requred for creating user
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["email"]
 
     objects = CustomUserManager()
 
@@ -28,3 +71,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.photo.delete(save=False)
         super().delete()
 
+
+class Invitation(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sender = models.ForeignKey(User, default=None, on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, default=None, on_delete=models.CASCADE)
+    message = models.CharField(max_length=50, null=True)
+    interest = models.CharField(
+        choices=INTEREST_CHOICES,
+        default=INTEREST_CHOICES.collaboration,
+        max_length=20,
+        null=False,
+        blank=False,
+    )

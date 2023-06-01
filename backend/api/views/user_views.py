@@ -25,6 +25,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
+
 # some change
 class UserViewSet(ModelViewSet):
     queryset = models.User.objects.all()
@@ -77,8 +78,5 @@ class UserViewSet(ModelViewSet):
         if data["lastname"]:
             user.lastname = data["lastname"]
         user.save()
-        user_serializer = serializers.UserSerializer(
-            user, many=False)
+        user_serializer = serializers.UserSerializer(user, many=False)
         return Response(user_serializer.data)
-
-

@@ -1,3 +1,5 @@
 venv**
 .venv**
 static/images
+.env
+env

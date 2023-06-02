@@ -15,6 +15,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     firstname = models.CharField(max_length=200, null=True)
     lastname = models.CharField(max_length=200, null=True)
     password = models.CharField(max_length=200)
+    has_profile = models.BooleanField(default=False)
     
     meeting_link = models.CharField(max_length=300, null=True)
     position = models.CharField(max_length=300, null=True)
@@ -71,11 +72,12 @@ class Invitation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sender = models.ForeignKey(User, related_name="invitations_sent", default=None, on_delete=models.CASCADE)
     receiver = models.ForeignKey(User, related_name="invitations_received", default=None, on_delete=models.CASCADE)
-    message = models.CharField(max_length=50, null=True)
+    message = models.CharField(max_length=500, null=True)
+    sent_at = models.DateTimeField(default=timezone.now)
     interest = models.CharField(
         choices=INTEREST_CHOICES,
         default=INTEREST_CHOICES.collaboration,
-        max_length=20,
+        max_length=50,
         null=False,
         blank=False,
     )

@@ -10,6 +10,12 @@ router.register(
     basename="user",
 )
 
+router.register(
+    r"invitations",
+    user_views.InvitationViewSet,
+    basename="invitation",
+)
+
 urlpatterns = [
     path(
         "users/login/",

@@ -133,7 +133,10 @@ class InvitationViewSet(GenericViewSet):
     # List all the invitations in the database
     def list(self, request):
         invitations = models.Invitation.objects.all()
-        serializer = serializers.InvitationSerializer(invitations, many=True)
+        ordered_invitations = invitations.order_by(
+        "-sent_at"
+        )
+        serializer = serializers.InvitationSerializer(ordered_invitations, many=True)
         return Response(serializer.data)
     
     @action(detail=True, methods=["post"], url_path="actions/send-invitation")
@@ -151,6 +154,11 @@ class InvitationViewSet(GenericViewSet):
         if current_user.id == invited_user.id:
             message = {"detail": "You cannot invite yourself"}
             return Response(message, status=status.HTTP_400_BAD_REQUEST,)
+        
+        if not current_user.has_profile:
+            message = {"details": "You need to complete your details to send invitations!"}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+            
             
         invitation = models.Invitation.objects.create(sender=current_user, receiver=invited_user, message=message, interest=interest)   
         serializer = serializers.InvitationSerializer(invitation, many=False)
@@ -160,6 +168,9 @@ class InvitationViewSet(GenericViewSet):
     def list_my_invitations(self, request):
         user = request.user
         invitations = user.invitations_received.all()
-        serializer = serializers.InvitationSerializer(invitations, many=True)
+        ordered_invitations = invitations.order_by(
+        "-sent_at"
+    )
+        serializer = serializers.InvitationSerializer(ordered_invitations, many=True)
         return Response(serializer.data)
     

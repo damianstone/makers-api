@@ -41,14 +41,31 @@ class UserSerializer(serializers.ModelSerializer):
     def get_token(self, obj):
         token = RefreshToken.for_user(obj)
         return str(token.access_token)
-    
+
+
+class UserSenderInvitationSerializer(serializers.ModelSerializer):
+    company_type = serializers.CharField(
+        source="get_company_type_display", required=True, allow_null=False
+    )
+    company_industry = serializers.CharField(
+        source="get_company_industry_display", required=True, allow_null=False
+    )
+
+    class Meta:
+        model = models.User
+        exclude = ["last_login", "is_superuser", "password", "user_permissions", "groups", "interests"]
 
 
 class InvitationSerializer(serializers.ModelSerializer):
-
+    sender = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = models.Invitation
         fields = "__all__"
+        
+    def get_sender(self, invitation):
+        sender_profile = UserSenderInvitationSerializer(invitation.sender, many=False)
+        return sender_profile.data
+        
         
 
 # Serializer used to check the minimum requeriments when creating the user profile

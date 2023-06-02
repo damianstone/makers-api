@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+import dj_database_url
 
 import service
 
@@ -25,10 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-2x_zu8c419)t$4fft+gn6x%y1_hsp#gw04s%7)=^*@--#8li(+"
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if "PRODUCTION" in os.environ:
+    DEBUG = True
+else:
+    DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 INSTALLED_APPS = [
@@ -118,16 +121,28 @@ ASGI_APPLICATION = "service.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("LOCAL_DB_NAME"),
-        "USER": os.environ.get("LOCAL_DB_USER"),
-        "PASSWORD": os.environ.get("LOCAL_DB_PASSWORD"),
-        "HOST": os.environ.get("LOCAL_DB_HOST"),
-        "PORT": os.environ.get("LOCAL_DB_PORT"),
+if "PRODUCTION" in os.environ:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("PG_DB"),
+            "USER": os.environ.get("PG_USER"),
+            "PASSWORD": os.environ.get("PG_PASSWORD"),
+            "HOST": os.environ.get("PG_HOST"),
+            "PORT": os.environ.get("PG_PORT"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("LOCAL_DB_NAME"),
+            "USER": os.environ.get("LOCAL_DB_USER"),
+            "PASSWORD": os.environ.get("LOCAL_DB_PASSWORD"),
+            "HOST": os.environ.get("LOCAL_DB_HOST"),
+            "PORT": os.environ.get("LOCAL_DB_PORT"),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

@@ -1,3 +1,6 @@
+# Makers
+A simple API built using Django REST and deployed on Heroku, using a bucket (AWS S3) to host the images and a PostgreSQL database to store the data.
+
 ## Initialization
 
 #### Create a virtual environment
@@ -19,13 +22,7 @@ pip install -r requirements.txt
 python manage.py createsuperuser
 ```
 
-#### Add sqlite db
-
-```bash
-db.sqlite3
-```
-
-#### Add PostgreSQL db (uncomment the code in settings.py)
+#### Add PostgreSQL db 
 Then, create an `.env` file  and add the following to connect your local database
  
 ```bash

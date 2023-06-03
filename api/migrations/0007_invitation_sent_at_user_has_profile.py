@@ -7,18 +7,18 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0006_alter_invitation_interest_alter_invitation_message'),
+        ("api", "0006_alter_invitation_interest_alter_invitation_message"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='invitation',
-            name='sent_at',
+            model_name="invitation",
+            name="sent_at",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AddField(
-            model_name='user',
-            name='has_profile',
+            model_name="user",
+            name="has_profile",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -55,7 +55,4 @@ INTEREST_CHOICES = Choices(
     ("white-labeling", "White Labeling"),
 )
 
-TYPE_CHOICES = Choices(
-        ("startup", "Startup"),
-        ("corporation", "Corporation")
-)
+TYPE_CHOICES = Choices(("startup", "Startup"), ("corporation", "Corporation"))

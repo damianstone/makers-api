@@ -18,7 +18,7 @@ class ChoicesField(serializers.Field):
     def to_internal_value(self, data):
         if data in self._choices:
             return getattr(self._choices, data)
-        raise serializers.ValidationError(["choice not valid"])   
+        raise serializers.ValidationError(["choice not valid"])
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -30,13 +30,18 @@ class UserSerializer(serializers.ModelSerializer):
         source="get_company_industry_display", required=True, allow_null=False
     )
     interests = serializers.ListField(
-        child=serializers.CharField(max_length=50, allow_blank=True),
-        allow_empty=True
+        child=serializers.CharField(max_length=50, allow_blank=True), allow_empty=True
     )
 
     class Meta:
         model = models.User
-        exclude = ["last_login", "is_superuser", "password", "user_permissions", "groups"]
+        exclude = [
+            "last_login",
+            "is_superuser",
+            "password",
+            "user_permissions",
+            "groups",
+        ]
 
     def get_token(self, obj):
         token = RefreshToken.for_user(obj)
@@ -53,20 +58,27 @@ class UserSenderInvitationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.User
-        exclude = ["last_login", "is_superuser", "password", "user_permissions", "groups", "interests"]
+        exclude = [
+            "last_login",
+            "is_superuser",
+            "password",
+            "user_permissions",
+            "groups",
+            "interests",
+        ]
 
 
 class InvitationSerializer(serializers.ModelSerializer):
     sender = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = models.Invitation
         fields = "__all__"
-        
+
     def get_sender(self, invitation):
         sender_profile = UserSenderInvitationSerializer(invitation.sender, many=False)
         return sender_profile.data
-        
-        
+
 
 # Serializer used to check the minimum requeriments when creating the user profile
 class CreateProfileSerializer(serializers.Serializer):
@@ -79,7 +91,7 @@ class CreateProfileSerializer(serializers.Serializer):
     company_valuation = serializers.CharField(required=False, allow_null=True)
     company_employees = serializers.CharField(required=False, allow_null=True)
     company_investment = serializers.CharField(required=False, allow_null=True)
-    
+
     photo = serializers.ImageField(
         required=True, allow_null=False, max_length=None, use_url=True
     )
@@ -87,26 +99,25 @@ class CreateProfileSerializer(serializers.Serializer):
     company_photo = serializers.ImageField(
         required=True, allow_null=False, max_length=None, use_url=True
     )
-    
+
     company_type = ChoicesField(
         choices=TYPE_CHOICES,
         required=False,
         allow_null=False,
     )
-    
+
     company_industry = ChoicesField(
         choices=INDUSTRY_CHOICES,
         required=False,
         allow_null=False,
     )
-    
+
     interests = serializers.ListField(
         child=ChoicesField(
-        choices=INTEREST_CHOICES,
-        required=False,
-        allow_null=False,
-    ),
+            choices=INTEREST_CHOICES,
+            required=False,
+            allow_null=False,
+        ),
         required=False,
         default=list,
     )
-

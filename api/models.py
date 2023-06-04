@@ -23,7 +23,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     company_photo = models.ImageField(null=True, blank=True)
     company_name = models.CharField(max_length=300, null=True)
-    company_description = models.CharField(max_length=300, null=True)
+    company_description = models.CharField(max_length=10000, null=True)
     company_valuation = models.CharField(max_length=300, null=True)
     company_employees = models.CharField(max_length=300, null=True)
     company_investment = models.CharField(max_length=300, null=True)

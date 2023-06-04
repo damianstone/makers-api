@@ -73,6 +73,7 @@ class UserModelViewSet(ModelViewSet):
             "receiver", flat=True)
         uninvited_users = models.User.objects.exclude(id__in=invited_users)
         queryset = uninvited_users.exclude(id=current_user.id)
+        queryset = queryset.exclude(has_profile=False)
 
         # getting query params
         company_type = request.query_params.get("company_type", None)

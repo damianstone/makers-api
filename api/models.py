@@ -65,6 +65,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return self.firstname + self.lastname
+    
+    def get_interests_display(self):
+        return [dict(INTEREST_CHOICES).get(interest) for interest in self.interests]
 
     def delete(self):
         self.photo.delete(save=False)

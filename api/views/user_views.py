@@ -69,7 +69,8 @@ class UserModelViewSet(ModelViewSet):
         current_user = request.user
 
         # exclude the users I already invited
-        invited_users = current_user.invitations_sent.values_list("receiver", flat=True)
+        invited_users = current_user.invitations_sent.values_list(
+            "receiver", flat=True)
         uninvited_users = models.User.objects.exclude(id__in=invited_users)
         queryset = uninvited_users.exclude(id=current_user.id)
 
@@ -84,7 +85,7 @@ class UserModelViewSet(ModelViewSet):
         if company_industry is not None:
             queryset = queryset.filter(company_industry=company_industry)
 
-        serializer = self.serializer_class(queryset, many=True)
+        serializer = serializers.UserProfileSerializer(queryset, many=True)
         return Response(serializer.data)
 
     # Register
@@ -111,11 +112,10 @@ class UserModelViewSet(ModelViewSet):
             message = {"detail": "Email already exist"}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.serializer_class(user, many=False)
+        serializer = serializers.UserSerializer(user, many=False)
         return Response(serializer.data)
 
     # Update properties in the user model
-
     def partial_update(self, request, pk=None):
         current_user = request.user
 
@@ -132,7 +132,33 @@ class UserModelViewSet(ModelViewSet):
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        fields_serializer = serializers.CreateProfileSerializer(data=request.data)
+        for key, value in request.data.items():
+            setattr(user, key, value)
+
+        user.save()
+        profile_serializer = serializers.UserSerializer(user, many=False)
+        return Response(profile_serializer.data)
+        
+
+    @action(detail=True, methods=["POST"], url_path="actions/create-profile")
+    def create_profile(self, request, pk=None):
+        current_user = request.user
+
+        try:
+            user = models.User.objects.get(pk=pk)
+        except:
+            message = {"detail": "User does not exist"}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+        if current_user.id != user.id:
+            message = {"detail": "Not authorized"}
+            return Response(
+                message,
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        fields_serializer = serializers.CreateProfileSerializer(
+            data=request.data)
         fields_serializer.is_valid(raise_exception=True)
 
         for key, value in fields_serializer.validated_data.items():
@@ -142,6 +168,31 @@ class UserModelViewSet(ModelViewSet):
         user.save()
         profile_serializer = self.serializer_class(user, many=False)
         return Response(profile_serializer.data)
+    
+    @action(detail=True, methods=["POST"], url_path="actions/upload-image")
+    def upload_image(self, request, pk=None):
+        current_user = request.user
+
+        try:
+            user = models.User.objects.get(pk=pk)
+        except:
+            message = {"detail": "User does not exist"}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+        if current_user.id != user.id:
+            message = {"detail": "Not authorized"}
+            return Response(
+                message,
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        for key, value in request.data.items():
+            setattr(user, key, value)
+
+        user.save()
+        profile_serializer = serializers.UserSerializer(user, many=False)
+        return Response(profile_serializer.data)
+        
 
 
 class InvitationViewSet(GenericViewSet):
@@ -159,7 +210,8 @@ class InvitationViewSet(GenericViewSet):
     def list(self, request):
         invitations = models.Invitation.objects.all()
         ordered_invitations = invitations.order_by("-sent_at")
-        serializer = serializers.InvitationSerializer(ordered_invitations, many=True)
+        serializer = serializers.InvitationSerializer(
+            ordered_invitations, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=["post"], url_path="actions/send-invitation")
@@ -212,5 +264,6 @@ class InvitationViewSet(GenericViewSet):
         user = request.user
         invitations = user.invitations_received.all()
         ordered_invitations = invitations.order_by("-sent_at")
-        serializer = serializers.InvitationSerializer(ordered_invitations, many=True)
+        serializer = serializers.InvitationSerializer(
+            ordered_invitations, many=True)
         return Response(serializer.data)

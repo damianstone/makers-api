@@ -214,6 +214,17 @@ class InvitationViewSet(GenericViewSet):
         serializer = serializers.InvitationSerializer(
             ordered_invitations, many=True)
         return Response(serializer.data)
+    
+    def destroy(self, request, pk=None):
+        try:
+            invitation = models.Invitation.objects.get(pk=pk)
+        except:
+            message ={"detail": "Invitation does not exit"}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        
+        invitation.delete()
+        return Response({"detail": "Invitation deleted"}, status=status.HTTP_200_OK)
+            
 
     @action(detail=True, methods=["post"], url_path="actions/send-invitation")
     def send_invitation(self, request, pk=None):

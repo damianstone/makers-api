@@ -29,10 +29,8 @@ class MyTokenObtainPairView(TokenObtainPairView):
 def validate_email_address(email_address):
     pattern = r"^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+@[A-Za-z0-9-]+\.[A-Za-z0-9-.]+$"
     if not re.search(pattern, email_address):
-        print(f"The email address {email_address} is not valid")
         return False
     return True
-
 
 class UserModelViewSet(ModelViewSet):
     queryset = models.User.objects.all()
@@ -141,6 +139,7 @@ class UserModelViewSet(ModelViewSet):
         return Response(profile_serializer.data)
         
 
+    # Update checking the necessary fields to create a profile
     @action(detail=True, methods=["POST"], url_path="actions/create-profile")
     def create_profile(self, request, pk=None):
         current_user = request.user
@@ -200,12 +199,6 @@ class InvitationViewSet(GenericViewSet):
     queryset = models.Invitation.objects.all()
     serializer_class = serializers.InvitationSerializer
     permission_classes = [IsAuthenticated]
-
-    # List all the invitations in the database just for admins (superusers)
-    # def get_permissions(self):
-    #     if self.action == "list":
-    #         return [IsAdminUser()]
-    #     return [permission() for permission in self.permission_classes]
 
     # List all the invitations in the database
     def list(self, request):

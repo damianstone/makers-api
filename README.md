@@ -1,5 +1,5 @@
 # Makers project in 5 days
-A simple API built using Django REST and deployed on Heroku, using a bucket (AWS S3) to host the images and a PostgreSQL database to store the data.
+A simple API built using Django REST and deployed on Heroku, using a bucket (AWS S3) to store the images and a PostgreSQL database to store the data.
 
 ## Initialization
 
